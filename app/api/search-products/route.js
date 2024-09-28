@@ -17,8 +17,8 @@
 
 // /app/api/search-products/route.js
 
-import { connectToDatabase } from "../../../lib/mongodb"; // Adjust the path as needed
-import Inventory from "../../../models/Inventory"; // Adjust the path as needed
+import { connectToDatabase } from "../../lib/mongodb"; // Adjust the path as needed
+import Inventory from "../../models/Inventory"; // Adjust the path as needed
 
 export async function GET(request) {
   // Parse the URL to extract search parameters

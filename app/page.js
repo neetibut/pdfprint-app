@@ -1,4 +1,8 @@
-import Image from "next/image";
+"use client";
+import React, { useRef, useState } from "react";
+
+import SubmittedDataList from "./components/SubmittedDataList";
+import { useReactToPrint } from "react-to-print";
 
 const order = {
   date: "Jan 9, 2023",
@@ -34,222 +38,149 @@ const order = {
 };
 
 export default function Home() {
+  const componentRef = useRef();
+
+  // State to store form data
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  // State to mock a database using an object structure
+  const [mockDatabase, setMockDatabase] = useState([]);
+
+  // Handle input change but do not update the mock database here
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  // Handle form submission, update the mock database here
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Generate a unique ID for each form submission (simple ID generation)
+    const id = Object.keys(mockDatabase).length + 1;
+
+    // Update the mock database with the new entry
+    setMockDatabase((prevData) => ({
+      ...prevData,
+      [id]: formData,
+    }));
+
+    console.log("Data captured and stored:", {
+      ...mockDatabase,
+      [id]: formData,
+    });
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    pageStyle: `
+      @page {
+        size: A4 portrait;
+        margin: 20mm;
+      }
+      body {
+        font-family: Arial, sans-serif;
+      }
+    `,
+  });
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {/* <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      <div>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto"
+        >
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Submit Your Information
+          </h2>
+
+          <div className="mb-4 flex items-center">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 pr-1"
+            >
+              Name:
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="mt-1 pl-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              required
+            />
+          </div>
+          <div className="mb-4 flex items-center">
+            <label
+              htmlFor="email"
+              className="mt-1 text-sm font-medium text-gray-700 pr-1"
+            >
+              Email:
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 pl-1 w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="message"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Message:
+            </label>
+            <textarea
+              name="message"
+              id="message"
+              value={formData.message}
+              onChange={handleChange}
+              className="mt-1 pl-1 pt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              required
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div> */}
-
-      {/* <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div> */}
-
-      {/* <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
+            Submit
+          </button>
+        </form>
+        {/* Data View Component */}
+        <div
+          ref={componentRef}
+          className="mt-10 p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto"
         >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Form Data</h2>
+          <p className="text-gray-700">
+            <strong>Name:</strong> {formData.name}
           </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
+          <p className="text-red-700">
+            <strong>Email:</strong> {formData.email}
           </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
+          <p className="text-gray-700">
+            <strong>Message:</strong> {formData.message}
           </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div> */}
-
-      <div className="container border-t-4 border-yellow-500">
-        <div className="flex flex-row justify-between my-6">
-          <div className="flex">
-            <img
-              src="https://res.cloudinary.com/dkpz9r2q7/image/upload/v1673288813/surfsup_scqki2.png"
-              className="h-20"
-            />
-            <div className="ml-4">
-              <p className="text-3xl mb-2">Invoice</p>
-              <p className="text-xl">#{order.invoiceNumber}</p>
-            </div>
-          </div>
-          <div className="text-right text-gray-700">
-            <p className="text-lg font-bold text-gray-800">Surfsup</p>
-            <p>2578 Palm Tree Way</p>
-            <p>Beach City, FL 30001</p>
-            <p>United States</p>
-          </div>
         </div>
-        <hr />
-        <div className="flex flex-row justify-between my-4">
-          <div>
-            <p className="uppercase text-xs text-gray-600 mb-">Bill To</p>
-            <p>{order.customer.name}</p>
-            <p>{order.customer.address}</p>
-            <p>
-              {order.customer.city}, {order.customer.state} {order.customer.zip}
-            </p>
-            <p>{order.customer.country}</p>
-          </div>
-          <div className="text-right">
-            <div className="mb-2">
-              <p className="uppercase text-xs text-gray-600">Invoice #</p>
-              <p>{order.invoiceNumber}</p>
-            </div>
-            <div className="mb-2">
-              <p className="uppercase text-xs text-gray-600">Date</p>
-              <p>{order.date}</p>
-            </div>
-            <div className="mb-2">
-              <p className="uppercase text-xs text-gray-600">Due Date</p>
-              <p>{order.dueDate}</p>
-            </div>
-          </div>
-        </div>
-        <hr />
-        <table className="min-w-full divide-y divide-gray-300">
-          <thead>
-            <tr>
-              <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 pl-0">
-                Item
-              </th>
-              <th className="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">
-                Description
-              </th>
-              <th className="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">
-                Quantity
-              </th>
-              <th className="py-3.5 px-3 text-left text-sm font-semibold text-gray-900 text-right">
-                Price
-              </th>
-              <th className="py-3.5 px-3 text-left text-sm font-semibold text-gray-900 text-right">
-                Tax
-              </th>
-              <th className="py-3.5 px-3 text-left text-sm font-semibold text-gray-900 pr-0 text-right">
-                Amount
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {order.lineItems.map((lineItem) => (
-              <tr>
-                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 pl-0">
-                  {lineItem.item}
-                </td>
-                <td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500">
-                  {lineItem.description}
-                </td>
-                <td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500">
-                  {lineItem.quantity}
-                </td>
-                <td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500 text-right">
-                  {lineItem.price}
-                </td>
-                <td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500 text-right">
-                  {lineItem.tax}
-                </td>
-                <td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500 pr-0 text-right">
-                  {lineItem.total}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="flex flex-row justify-between mt-20">
-          <div>
-            <p className="text-gray-400 text-sm mb-2">
-              We accept cash, check, and card
-            </p>
-            <p className="text-gray-400 text-sm">Thanks for your business!</p>
-          </div>
-          <div className="text-right">
-            <p className="text-gray-600 mb-2">Total</p>
-            <p className="text-4xl font-bold text-gray-800">
-              {order.invoiceTotal}
-            </p>
-          </div>
-        </div>
+        {/* Submitted Data List from db */}
+        <SubmittedDataList data={mockDatabase} />
+        {/* Button to create, print, save and preview PDF */}
+        <button
+          onClick={handlePrint}
+          className="mt-6 py-2 px-4 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mx-auto block"
+        >
+          Print to PDF
+        </button>
       </div>
     </main>
   );

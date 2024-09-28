@@ -1,7 +1,7 @@
 // /app/api/submit-form/route.js
 
-import { connectToDatabase } from "../lib/mongodb"; // Adjust path as necessary
-import FormSubmission from "../models/FormSubmission"; // Define a Mongoose model
+import { connectToDatabase } from "../../lib/mongodb"; // Adjust path as necessary
+import FormSubmission from "../../models/form-submission"; // Define a Mongoose model
 
 export async function POST(request) {
   try {
